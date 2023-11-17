@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Proxima Nova reference -->
+    <link href="https://use.typekit.net/emv3zbo.css" rel="stylesheet" crossorigin="anonymous">
+
+    <!-- Arizona Bootstrap reference -->
+    <link rel="stylesheet" href="https://cdn.digital.arizona.edu/lib/arizona-bootstrap/2.0.25/css/arizona-bootstrap.min.css" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <title>Image Map Hover Effect</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+
+        body {
+                font-family: 'proxima-nova'; /* Assuming 'proxima-nova' is the correct family name */
+            }
+        #image-map-container {
+
+            position: relative;
+            display: inline-block;
+            box-sizing: border-box;
+            overflow: hidden;
+            /* Ensure the content does not spill out of the border radius */
+            margin: 10px;
+        }
+
+        #image-map-area {
+            position: relative;
+            display: inline-block;
+            padding-right: 0;
+        }
+
+        #image-map-source {
+            display: block;
+            width: 70%;
+            height: 70%;
+            object-fit: cover;
+            border-radius: 8px;
+            /* Rounded corners */
+            border: solid 5px rgba(255, 255, 255, 0.8);
+            /* White border */
+            overflow: hidden;
+            /* Ensure the content does not spill out */
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+
+        img {
+            display: block;
+            /* Removes bottom margin/whitespace */
+        }
+
+        #legend {
+            display: inline-block;
+            vertical-align: top;
+            margin-left: 20px;
+            padding: 10px;
+        }
+
+        .legend-item {
+            margin-bottom: 5px;
+        }
+
+        .color-box {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-right: 5px;
+            border: 1px solid #000;
+        }
+
+        #tooltip {
+            position: absolute;
+            padding: 4px;
+            background: white;
+            border: 1px solid black;
+            display: none;
+            pointer-events: none;
+            /* Ensure the tooltip doesn't interfere with mouse events */
+        }
+
+        #legend {
+            position: absolute;
+            top: 10px;
+            left: 55%;
+            padding: 10px;
+            font-weight: bold;
+            border-radius: 8px;
+            /* Rounded corners */
+            overflow: hidden;
+            /* Ensure the content does not spill out */
+            margin: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            /* White background with 80% transparency */
+        }
+
+        .selected {
+            /* Style for selected polygon */
+            border: 2px solid #FFD700;
+            /* Gold border */
+            box-shadow: 0 0 10px #FFD700;
+            /* Gold glow */
+        }
+
+        #details-image {
+            position: absolute;
+            top: 10px;
+            /* Adjust the value to position the image vertically */
+            right: 10px;
+            /* 10px margin from the right edge */
+            width: 30%;
+            height: 49.0%;
+            border-radius: 8px;
+            /* Rounded corners */
+            border: solid 5px rgba(255, 255, 255, 0.8);
+            /* White border */
+            overflow: hidden;
+            /* Ensure the content does not spill out */
+            margin: 10px;
+
+        }
+
+        #details {
+            width: 47.7%;
+            text-align: justify;
+            background-color: rgba(255, 255, 255, 0.8);
+            /* White background with 80% transparency */
+            border-radius: 8px;
+            /* Rounded corners */
+            overflow: hidden;
+            /* Ensure the content does not spill out of the border radius */
+            padding: 15px;
+            /* 10px padding on all sides */
+            margin: 10px;
+        }
+
+
+        @media (max-width: 768px) {
+            html, body {
+    width: 100%;
+    height: 100%;
+}
+
+}
+
+    </style>
+</head>
+
+<body>
+
+    <div id="image-map-container">
+        <div id="image-map-area">
+            <img id="image-map-source" src="imageonline-co-exposurephoto (1).png" usemap="#image-map">
+            <canvas id="image-map-canvas"></canvas>
+        </div>
+    </div>
+
+
+    <!-- Legend -->
+    <div id="legend">
+        <h3>Legend</h3>
+        <!-- Legend items will be inserted here by the script -->
+    </div>
+
+    <div id="details">
+        <h3 id="details-title">Details</h3>
+        <p id="details-text">Select a polygon to see the details here.</p>
+    </div>
+    <img id="details-image" src="" alt="Details Image" style="display:none;">
+    <!-- Moved outside and initially hidden -->
+
+
+    <map name="image-map">
+        <area target="" alt="Rainforest" title="Rainforest" href="" coords="410,425,560,384,567,376,537,347,528,348,500,317,485,310,470,298,447,287,406,296,384,314,374,313,348,337,340,337,312,366" shape="poly">
+        <area target="" alt="Human Habitat" title="Human Habitat" href="" coords="747,493,801,476,795,422,712,381,716,372,711,352,694,342,674,355,673,361,659,356,668,344,614,325,594,331,587,370,611,390,607,428,614,435,634,433,633,456,640,469,668,476,712,464,718,484" shape="poly">
+        <area target="" alt="Leo" title="Leo" href="" coords="801,473,926,435,923,395,893,372,873,381,859,359,838,353,823,360,812,336,792,334,776,340,752,333,737,340,724,333,672,343,658,356,671,361,692,343,712,349,716,368,715,383,794,422" shape="poly">
+        <area target="" alt="Desert" title="Desert" href="" coords="858,355,966,322,970,311,949,291,941,290,924,271,913,273,898,257,866,244,833,254,819,266,784,276,821,286,833,292,825,309,816,338" shape="poly">
+        <area target="" alt="Savannah" title="Savannah" href="" coords="737,339,758,333,822,318,833,291,787,275,755,270,513,331,526,348,539,348,563,371,588,367,593,331,615,326,665,342" shape="poly">
+        <area target="" alt="Mangroves" title="Mangroves" href="" coords="663,278,732,259,755,270,673,291" shape="poly">
+        <area target="" alt="Ocean" title="Ocean" href="" coords="504,319,513,332,673,291,663,279" shape="poly">
+        <area target="" alt="Agrivoltaics" title="Agrivoltaics" href="" coords="635,598,752,638,822,604,859,555,795,539,769,546,747,555,697,573" shape="poly">
+        <area target="" alt="Analytical Lab" title="Analytical Lab" href="" coords="425,141,482,125,534,142,536,153,494,168,425,152" shape="poly">
+        <area target="" alt="SAM" title="SAM" href="" coords="260,192,309,176,308,151,95,67,15,75,2,88,44,113" shape="poly">
+    </map>
+
+    <script>
+
+        // Define an array with details for each polygon
+        var polygonDetails = [
+            { name: 'Rainforest', text: "Biosphere 2's 20,000 sq. ft. rainforest biome, inspired by the Amazon Basin, initially housed over 400 plant species, with trees capable of reaching 74-80 feet in height. Since its establishment, the variety of species has reduced to about 100 due to natural selection and management decisions, including the removal of the fast-growing legume tree Leucaena leucocephala to allow other species to flourish. Research in the biome focuses on how tropical plants interact with the atmosphere and water, particularly under changing conditions, providing insights into climate change impacts on ecosystems. The rainforest is divided into habitats such as lowland rainforest with large trees, terraces with small trees and crops, a ginger belt, a bamboo belt, an Amazonian floodplain analog, and a tepui cloud forest that has evolved into a marsh. The biome's soils are engineered and vary in texture, with a topsoil layer generally under one meter thick, supporting the diverse plant life and a few animal species, mostly insects.", imageUrl: 'rainforest.jpg' },
+            { name: 'Human Habitat', text: "In the early 1990s, Biosphere 2 in Oracle, Arizona, served as an experimental ecological enclosure where the original crew, known as 'Biospherians', lived for two years in a self-sustaining habitat. Their accommodations were minimalist and functional, with private quarters akin to small dorm rooms, and communal spaces including a kitchen, dining area, and lounge to support a sense of community. The kitchen, relying on crops grown within Biosphere 2, necessitated culinary creativity, and the bathroom facilities featured composting toilets to conserve water. Work areas were dedicated to managing the internal biomes and scientific research, while advanced utility systems supported sustainability with features like energy-efficient lighting and water recycling. Despite space constraints, psychological well-being was addressed by incorporating aesthetic elements such as natural light, an art gallery, and a library, highlighting the endeavor to balance functionality with quality of life in this unprecedented closed-system environment.", imageUrl: 'human.jpg' },
+            { name: 'Leo', text: "Understanding the process interactions and feedbacks among water, porous geological media, microbes, and vascular plants, is crucial for improving predictions of the response of Earth’s critical zone to future climatic conditions. However, the integrated coevolution of landscapes under change, is notoriously difficult to investigate. Laboratory studies are limited in spatial and temporal scale, while field studies lack observational density and control. To bridge the gap between controlled laboratory and uncontrolled field studies, the University of Arizona built a macrocosm experiment of unprecedented scale: The Landscape Evolution Observatory (LEO) at Biosphere 2. Initial sensor, sampler, and soil-coring data, are providing insights into the linkages between water flow, weathering, and biological community development. These interacting processes drive the model systems to increasingly complex states, potentially perturbed by changes in climatic forcing. By intensively monitoring the evolutionary trajectory, integrating data with mathematical models, and fostering community-wide collaborations, we envision that emergent landscape structures and functions are linked and as significant progress emerges, LEO operations predict the coupled hydro-biogeochemical and ecological responses to global change.", imageUrl: 'leo.jpg' },
+            { name: 'Desert', text: "The Biosphere 2's desert biome, initially designed to emulate a desert scrub ecosystem with a coastal climate pattern of erratic winter rain and summer drought, faced challenges when higher than anticipated rainfall and low evapotranspiration led to denser vegetation and grass invasion. In response, management shifted in 1994 towards a Mediterranean scrub woodland before changing again to foster more arid conditions. Efforts are now focused on promoting arid-adapted plant species and reducing grass species that utilize C4 photosynthesis. The biome's soils were engineered to reflect the diversity found in arid regions, from dune sand to clay-rich profiles, with features like mini-rhizotron tubes for observing underground activity and a playa for seasonal salt accumulation, which is now dominated by saltbushes. An artificial tinaja provides a habitat for freshwater species. Over time, plant diversity has diminished due to changes in management and climate, the absence of pollinating insects, and increased extinction rates.", imageUrl: 'desert.jpg' },
+            { name: 'Savannah', text: "Biosphere 2's savanna biome served as a hydrological buffer between the desert and rainforest areas, aiming to replicate the atmospheric chemistry balancing act seen in real-world tropical savannas. This biome also focused on integrating biodiversity and aesthetic elements of savannas through its diverse vegetation zones planted with edible species for various animals. The savanna itself was structured into four distinct regions: the Quartzite Slope with its waterfall, the Upper Savanna with its fresh-water wetland species and gallery forest, the billabongs designed to mimic hyperseasonal environments, and the grass-dominated Lower Savanna adjacent to the Upper thornscrub. Each region was carefully designed to reflect different aspects of savanna ecosystems, from water management to plant diversity, catering to both ecological research and the needs of species within the biome.", imageUrl: 'savannah.jpg' },
+            { name: 'Mangroves', text: "The Mangrove mesocosm, covering 441 m2, is a meticulously constructed estuarine model simulating two primary wetland habitats: marshes and forested swamps, the latter constituting 80% of the area with 542 mangroves and 15 freshwater trees. Composed of six connected sections, each featuring distinct community types to promote biodiversity, the mesocosm includes barriers reinforced with steel rebar and notches to allow water and animal movement. Key ecosystems within the model include a wetland-encircled Freshwater Pond, an Oligohaline marsh acting as a transitional zone, a Salt Marsh/White Mangrove section marking the marine area's beginning, followed by a Black Mangrove section, and finally, the northern sections, Oyster Bay and Fringing Red Mangrove. Initially, the mesocosm supported a variety of fauna, such as crawfish, snails, and various fish and crustaceans, but it has since experienced a decrease in faunal diversity, potentially due to the effects of biotic closure and the lack of tidal influence.", imageUrl: 'mangroves.png' },
+            { name: 'Ocean', text: "The Biosphere 2 Marine Mesocosm, the world's largest enclosed ocean system, has been employed for critical research in coral reef resilience. Mimicking a Caribbean reef, it provides a controlled environment with customizable physical and chemical parameters to study coral responses to changing conditions. Notably, Columbia University used the mesocosm in 1996 for a pivotal study on photosynthesis and calcification under past, present, and predicted future CO2 conditions, finding a significant decline in coral calcification expected by mid-century. Despite subsequent neglect and ecosystem degradation, efforts are currently underway to revitalize the Ocean, reconstructing a diverse coral reef ecosystem to further explore and develop methods for reef restoration on a global scale, supported by advanced life support systems.", imageUrl: 'ocean.jpeg' },
+            {
+        name: 'Agrivoltaics',
+        text: "Agrivoltaics, the co-location of agriculture and photovoltaics (PV), offers synergies that improve resilience in food, energy, and water systems. It addresses climate vulnerabilities by reducing plant stress through PV shade, enhancing PV efficiency, and minimizing water use. Arizona's adoption of agrivoltaics could mitigate a projected loss of 1/3 of its irrigated agriculture due to water scarcity. Our plan aims to expand agrivoltaic research, understand its impacts across climates, integrate water purification systems, and link research to socio-political science and education to build resilience.",
+        imageUrl: 'https://cdn.uanews.arizona.edu/s3fs-public/styles/uaqs_large/public/story-images/170417_AV_Demers_2.jpg?itok=kVzwZM9P'
+    },
+    // Analytical Lab
+    {
+        name: 'Biogeochemistry Laboratory',
+        text: "Biosphere 2's Biogeochemistry Laboratory focuses on soil and sediment chemical processes, facilitated by a suite of sophisticated equipment. It includes a TOC and nitrogen analyzer, a high precision liquid chromatograph, an ion chromatography system, and a gas chromatograph-mass spectrometer. These tools enable detailed analysis of organic compounds, carbohydrates, amino acids, cations, anions, and other elements, essential for understanding the complex interactions within Earth's critical zone.",
+        imageUrl: 'https://biosphere2.org/sites/default/files/styles/az_large/public/2021-09/geochem1.jpg?itok=KwHLIhgk'
+    },
+    {
+        name: 'SAM',
+        text: "SAM, a high-fidelity Mars habitat analog at Biosphere 2, offers varying mission durations and fidelity levels, including a hermetic seal option and communication delays to simulate Mars. It comprises a greenhouse, workshop, kitchen, bath, common area, and sleeping quarters with a CO2 scrubber. The adjacent Mars yard features rovers, suits, and a synthetic lava tube for testing in a gravity off-set rig. SAM advances our understanding of living on extraterrestrial bodies, aiding the human quest to inhabit new worlds.",
+        imageUrl: 'https://biosphere2.org/sites/default/files/styles/az_large/public/2023-06/IMG_3535-banner.jpg?itok=YlYk9zlb'
+    }
+        ];
+
+
+
+        $(document).ready(function () {
+            var image = $('#image-map-source');
+            var canvas = $('#image-map-canvas')[0];
+            var ctx = canvas.getContext('2d');
+            var legend = $('#legend');
+            var polygons = []; // Array to store information about each polygon
+
+            // Set canvas dimensions equal to the image
+            canvas.width = image.width();
+            canvas.height = image.height();
+
+            var selectedIndex = null; // Keep track of the selected polygon
+
+            // Array of colors for the polygons
+            var colors = [
+    'rgba(255, 0, 0, 0.5)',     // Red
+    'rgba(0, 255, 0, 0.5)',     // Green
+    'rgba(0, 0, 255, 0.5)',     // Blue
+    'rgba(255, 255, 0, 0.5)',   // Yellow
+    'rgba(255, 0, 255, 0.5)',   // Magenta
+    'rgba(0, 255, 255, 0.5)',   // Cyan
+    'rgba(255, 165, 0, 0.5)',   // Orange
+    'rgba(128, 0, 128, 0.5)',   // Purple
+    'rgba(255, 192, 203, 0.5)', // Pink
+    'rgba(128, 128, 0, 0.5)',   // Olive
+    'rgba(0, 128, 0, 0.5)',     // Dark Green
+    'rgba(128, 0, 0, 0.5)',     // Maroon
+    'rgba(0, 128, 128, 0.5)',   // Teal
+    'rgba(75, 0, 130, 0.5)'     // Indigo
+];
+
+
+            // Legend names array
+            var names = ['Rainforest', 'Human Habitat', 'Leo', 'Desert', 'Savannah', 'Mangroves', 'Ocean', 'Agrivoltaics', 'Analytical Lab', 'SAM'];
+
+            // Create polygons based on the areas defined in the map
+            $('area').each(function (index) {
+                var color = colors[index % colors.length];
+                var name = names[index];
+                var legendItem = $('<div class="legend-item"></div>');
+                 // Assign an ID to each legend item
+        legendItem.attr('id', 'legend-item-' + index);
+
+// Add click event listener to legend items
+legendItem.on('click', function () {
+    selectPolygon(index);
+    updateDetails(index);
+});
+                var colorBox = $('<div class="color-box"></div>').css('background-color', color);
+                legendItem.append(colorBox).append(document.createTextNode(name));
+                legend.append(legendItem);
+                var coords = $(this).attr('coords').split(',');
+                var polyCoords = [];
+                for (var i = 0; i < coords.length; i += 2) {
+                    polyCoords.push({
+                        x: parseInt(coords[i], 10),
+                        y: parseInt(coords[i + 1], 10)
+                    });
+                }
+
+                // Scale and store the polygons and their colors
+                polygons.push({
+                    polyCoords: polyCoords.map(function (coord) {
+                        return {
+                            x: coord.x / 1.4025,
+                            y: coord.y / 1.4025
+                        };
+                    }),
+                    color: color
+                });
+            });
+
+            // Function to handle selection of a polygon
+    function selectPolygon(index) {
+        selectedIndex = index;
+        highlightSelection();
+    }
+
+    // Function to update details based on selected index
+    function updateDetails(index) {
+        var details = polygonDetails[index];
+        $('#details').show();
+        $('#details-title').text(details.name + " Details");
+        $('#details-text').text(details.text);
+        $('#details-image').attr('src', details.imageUrl).show();
+    }
+
+            // Function to check if a point is inside a polygon
+            function checkPointInPolygon(point, polygon) {
+                var x = point.x, y = point.y;
+                var inside = false;
+                for (var i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+                    var xi = polygon[i].x, yi = polygon[i].y;
+                    var xj = polygon[j].x, yj = polygon[j].y;
+                    var intersect = ((yi > y) != (yj > y))
+                        && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                    if (intersect) inside = !inside;
+                }
+                return inside;
+            }
+
+            // Function to highlight the selected polygon
+            function highlightSelection() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+                polygons.forEach(function (polygon, index) {
+                    ctx.beginPath();
+                    ctx.moveTo(polygon.polyCoords[0].x, polygon.polyCoords[0].y);
+                    polygon.polyCoords.forEach(function (point) {
+                        ctx.lineTo(point.x, point.y);
+                    });
+                    ctx.closePath();
+                    ctx.fillStyle = polygon.color;
+                    ctx.fill();
+                    ctx.strokeStyle = index === selectedIndex ? 'gold' : 'black';
+                    ctx.lineWidth = index === selectedIndex ? 3 : 1;
+                    ctx.stroke();
+                });
+            }
+
+            // Mouse event listener to detect selection
+            $(canvas).on('click', function (event) {
+                var rect = canvas.getBoundingClientRect();
+                var scaleX = canvas.width / rect.width;
+                var scaleY = canvas.height / rect.height;
+                var x = (event.clientX - rect.left) * scaleX;
+                var y = (event.clientY - rect.top) * scaleY;
+
+                var selected = false;
+
+                polygons.forEach(function (polygon, index) {
+                    if (checkPointInPolygon({ x: x, y: y }, polygon.polyCoords)) {
+                        selectedIndex = index;
+                        selected = true;
+                    }
+                });
+
+                if (selectedIndex !== null) {
+                    var details = polygonDetails[selectedIndex]; // Get the details for the selected polygon
+                    updateDetails(selectedIndex);
+
+                    $('#details').show();
+                    $('#details-title').text(details.name + " Details");
+                    $('#details-text').text(details.text);
+
+                    // Now, the image is outside the #details div
+                    $('#details-image').attr('src', details.imageUrl).show();
+                } else {
+                    $('#details').hide();
+                    $('#details-image').hide(); // Hide the image when there are no details to show
+                }
+
+
+                highlightSelection();
+            });
+
+            // Initial draw to show the polygons
+            highlightSelection();
+        });
+    </script>
+
+
+</body>
+
+</html>
